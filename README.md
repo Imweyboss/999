@@ -2,11 +2,12 @@
 
 *Description*
 
-This project is a Python script that scans a website with real estate listings, extracts information about new listings, and stores them in a database. This database is stored in the AWS S3 Bucket. In addition, the script sends notifications about new listings to Telegram.
+This project is a Python script that scans a website with real estate listings, extracts information about new listings, and stores it in a database. This database is stored in AWS S3 Bucket. In addition, the script sends notifications about new listings to Telegram.
 
 *Installing*
 
 Clone the repository:
+https://github.com/Imweyboss/999.git
 
 Set up the necessary dependencies:
 pip install -r requirements.txt
