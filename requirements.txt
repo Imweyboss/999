@@ -1,0 +1,9 @@
+sqlite3
+re
+botocore
+requests
+logging
+beautifulsoup4
+boto3
+json
+
