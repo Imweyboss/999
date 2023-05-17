@@ -7,8 +7,9 @@ from bs4 import BeautifulSoup
 import boto3
 import json
 
-secretsmanager = boto3.client('secretsmanager')
-s3 = boto3.resource('s3')
+session = boto3.Session(profile_name='default')
+secretsmanager = session.client('secretsmanager')
+s3 = session.resource('s3')
 
 bucket_name = 'bucket-for-tg-chat'
 db_file_name = 'ads_database.db'
@@ -85,8 +86,7 @@ def save_ad_to_database(ad_info):
     c = conn.cursor()
 
     c.execute('INSERT INTO ads VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-              (ad_info['id'], ad_info['about'], ad_info['total_price'], ad_info['update_time'], 
-ad_info['image_url'],
+              (ad_info['id'], ad_info['about'], ad_info['total_price'], ad_info['update_time'], ad_info['image_url'],
                ad_info['ad_url'], ad_info['views'], ad_info['rooms'], ad_info['address']))
 
     conn.commit()
@@ -184,10 +184,7 @@ session = requests.Session()
 
 def send_telegram_message(TOKEN, CHAT_ID, ad_info):
     modified_ad_url = ad_info['ad_url'] + "#gallery-1"
-    message = f" *{ad_info['rooms']} за 
-{ad_info['total_price']}*\n{ad_info['second_line_address']}\n📍*{ad_info['third_line_address']}*\n\n⏱️ 
-{ad_info['update_time']}\n👁️‍🗨️ {ad_info['views']}\n\n📷 [Фото]({ad_info['image_url']})\n\n🔎 [Ссылка на 
-источник]({modified_ad_url})"
+    message = f" *{ad_info['rooms']} за {ad_info['total_price']}*\n{ad_info['second_line_address']}\n📍*{ad_info['third_line_address']}*\n\n⏱️ {ad_info['update_time']}\n👁️‍🗨️ {ad_info['views']}\n\n📷 [Фото]({ad_info['image_url']})\n\n🔎 [Ссылка на источник]({modified_ad_url})"
     session.post(
         url=f'https://api.telegram.org/bot{TOKEN}/sendMessage',
         data={
@@ -211,18 +208,15 @@ if __name__ == "__main__":
                 logger.info("Ad doesn't exist in the database. Saving...")
                 save_ad_to_database(ad_info)
 
-                if ad_info['total_price'] is not None and 'Кишинёв' in ad_info['address'] and 'Кишинёв' in 
-ad_info[
+                if ad_info['total_price'] is not None and 'Кишинёв' in ad_info['address'] and 'Кишинёв' in ad_info[
                     'about']:
                     logger.info("Sending ad to Telegram...")
                     send_telegram_message(TOKEN, CHAT_ID, ad_info)
                 else:
                     logger.debug(
-                        "Ad has no price, city is not Кишинёв or Кишинёв is not in the about text, not 
-sending to "
+                        "Ad has no price, city is not Кишинёв or Кишинёв is not in the about text, not sending to "
                         "Telegram.")
             else:
                 logger.debug("Ad already exists in the database.")
     except Exception as e:
         logger.exception(e)
-
