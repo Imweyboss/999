@@ -186,6 +186,9 @@ def send_telegram_message(TOKEN, CHAT_ID, ad_info):
     warning_message = "НЕ ОСТАВЛЯЙТЕ ЗАЛОГ БЕЗ ДОГОВОРА"
     message = f" *{ad_info['rooms']} за {ad_info['total_price']}*\n{ad_info['second_line_address']}\n📍*{ad_info['third_line_address']}*\n\n⏱️ {ad_info['update_time']}\n👁️‍🗨️ {ad_info['views']}\n\n\n ⚠️*{warning_message}*⚠️"
 
+    if ad_info['price'] == '1':
+        logger.debug("Ad has a price of 1, not sending to Telegram.")
+        return
     session.post(
         url=f'https://api.telegram.org/bot{TOKEN}/sendPhoto',
         data={
@@ -221,6 +224,9 @@ if __name__ == "__main__":
                 if ad_info['total_price'] is not None and 'Кишинёв' in ad_info['address'] and 'Кишинёв' in ad_info[
                     'about']:
                     logger.info("Sending ad to Telegram...")
+                    if ad_info['price'] == '1':
+                        logger.debug("Ad has a price of 1, not sending to Telegram.")
+                        continue
                     send_telegram_message(TOKEN, CHAT_ID, ad_info)
                 else:
                     logger.debug(
