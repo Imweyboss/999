@@ -181,16 +181,26 @@ def get_ad_information():
 
 session = requests.Session()
 
-
 def send_telegram_message(TOKEN, CHAT_ID, ad_info):
     modified_ad_url = ad_info['ad_url'] + "#gallery-1"
-    message = f" *{ad_info['rooms']} за {ad_info['total_price']}*\n{ad_info['second_line_address']}\n📍*{ad_info['third_line_address']}*\n\n⏱️ {ad_info['update_time']}\n👁️‍🗨️ {ad_info['views']}\n\n📷 [Фото]({ad_info['image_url']})\n\n🔎 [Ссылка на источник]({modified_ad_url})"
+    warning_message = "НЕ ОСТАВЛЯЙТЕ ЗАЛОГ БЕЗ ДОГОВОРА"
+    message = f" *{ad_info['rooms']} за {ad_info['total_price']}*\n{ad_info['second_line_address']}\n📍*{ad_info['third_line_address']}*\n\n⏱️ {ad_info['update_time']}\n👁️‍🗨️ {ad_info['views']}\n\n\n ⚠️*{warning_message}*⚠️"
+
     session.post(
-        url=f'https://api.telegram.org/bot{TOKEN}/sendMessage',
+        url=f'https://api.telegram.org/bot{TOKEN}/sendPhoto',
         data={
             'parse_mode': 'Markdown',
             'chat_id': CHAT_ID,
-            'text': message
+            'photo': ad_info['image_url'],
+            'caption': message,
+            'reply_markup': json.dumps({
+                "inline_keyboard": [[
+                    {
+                        "text": "Посмотреть 👀",
+                        "url": modified_ad_url
+                    }
+                ]]
+            })
         }
     ).json()
 
